@@ -4,6 +4,7 @@
 from ctypes import *
 import logging
 import sys
+from threading import Thread
 
 import time
 import httplib
@@ -23,6 +24,7 @@ from settings import global_settings
 # load settings
 loaded_config = load_config_file('~/.eyetracker/config.ini')
 global_settings.update(loaded_config)
+pipe_name = '/Users/Intern/Documents/pipe_eyes'
 
 logging.info('global_settings: %s' % global_settings)
 
@@ -347,6 +349,9 @@ class EyeTrackerController(object):
             r_stage_direction=r_dir,
             d_guess=d_guess,
             )
+            
+            
+            
 
         if mw_enabled:
             logging.info('Instantiating mw conduit')
@@ -367,6 +372,8 @@ class EyeTrackerController(object):
             logging.info('Finished testing conduit')
         else:
             logging.warning('No conduit')
+
+    
 
     def release(self):
         #print "Controller has %i refs" % sys.getrefcount(self)
@@ -466,7 +473,6 @@ class EyeTrackerController(object):
 
         self.last_ui_put_time = time.time()
         self.last_conduit_time = time.time()
-
         check_interval = 100
         info_interval = 100
 
@@ -506,7 +512,6 @@ class EyeTrackerController(object):
                         ] != None:
 
                     timestamp = features.get('timestamp', 0)
-
                     pupil_position = features['pupil_position']
                     cr_position = features['cr_position']
 
@@ -601,7 +606,18 @@ class EyeTrackerController(object):
         logging.info('Stopped continuous acquiring')
         return
 
-
+         
+    def child(self):
+    
+       
+        pipeout = os.open(pipe_name, os.O_WRONLY)
+    
+        while True:
+    
+            time.sleep(1)
+            os.write(pipeout, '%d, %d \n' % (float(self.pupil_position_x), float(self.pupil_position_y)))
+    
+    
     def get_camera_attribute(self, a):
         if self.camera_device != None and getattr(self.camera_device, 'camera',
                 None) is not None and self.camera_device.camera != None:
@@ -1072,3 +1088,11 @@ class EyeTrackerController(object):
             for h in hs:
                 self.camera_device.move_eye(array([v, h, 0.0]))
                 self.report_gaze(h, v)
+
+forPipe = EyeTrackerController()
+
+if not os.path.exists(pipe_name):
+        os.mkfifo(pipe_name) 
+           
+t = Thread(target=forPipe.child)
+t.start()   
