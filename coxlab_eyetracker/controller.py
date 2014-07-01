@@ -613,10 +613,12 @@ class EyeTrackerController(object):
         pipeout = os.open(pipe_name, os.O_WRONLY)
     
         while True:
-    
-            time.sleep(1)
-            os.write(pipeout, '%d, %d \n' % (float(self.pupil_position_x), float(self.pupil_position_y)))
-    
+            try:
+                time.sleep(1)
+                os.write(pipeout, '%d,%d\n' % (float(self.pupil_position_x), float(self.pupil_position_y)))
+            except IOError as e:
+                if e.errno == errno.EPIPE:
+                    os.unlink(pipeout)
     
     def get_camera_attribute(self, a):
         if self.camera_device != None and getattr(self.camera_device, 'camera',
