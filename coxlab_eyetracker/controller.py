@@ -5,6 +5,7 @@ from ctypes import *
 import logging
 import sys
 from threading import Thread
+import socket
 
 import time
 import httplib
@@ -608,13 +609,11 @@ class EyeTrackerController(object):
 
          
     def child(self):
-    
        
         pipeout = os.open(pipe_name, os.O_WRONLY)
     
         while True:
             try:
-                time.sleep(1)
                 os.write(pipeout, '%d,%d\n' % (float(self.pupil_position_x), float(self.pupil_position_y)))
             except IOError as e:
                 if e.errno == errno.EPIPE:
@@ -1097,4 +1096,4 @@ if not os.path.exists(pipe_name):
         os.mkfifo(pipe_name) 
            
 t = Thread(target=forPipe.child)
-t.start()   
+t.start()
