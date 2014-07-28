@@ -41,3 +41,7 @@ Depending on the state of your Python install, you might run into a few problems
 
 Let us know if you run into any trouble.
 
+## Changes
+
+This version of the Coxlab Eyetracker has added features. This includes modifications in order to use the program with ferrets rather than with mice as well as support for both UDP and Named Pipes in order to transfer information about the gaze of the ferret. 
+
