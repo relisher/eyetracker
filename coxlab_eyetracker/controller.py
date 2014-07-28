@@ -15,6 +15,7 @@ from scipy import *
 
 from coxlab_eyetracker.util import *
 
+import configcommunication
 from coxlab_eyetracker.image_processing import *
 from coxlab_eyetracker.camera import *
 from coxlab_eyetracker.led import *
@@ -26,6 +27,9 @@ from settings import global_settings
 loaded_config = load_config_file('~/.eyetracker/config.ini')
 global_settings.update(loaded_config)
 pipe_name = '/Users/Intern/Documents/pipe_eyes'
+UDP_IP = configcommunication.information['IP_ADDRESS']
+UDP_PORT = configcommunication.information['PORT']
+WHICH = configcommunication.information['TYPE']
 
 logging.info('global_settings: %s' % global_settings)
 
@@ -609,16 +613,29 @@ class EyeTrackerController(object):
 
          
     def child(self):
-       
-        pipeout = os.open(pipe_name, os.O_WRONLY)
-    
-        while True:
-            try:
-                os.write(pipeout, '%d,%d\n' % (float(self.pupil_position_x), float(self.pupil_position_y)))
-            except IOError as e:
-                if e.errno == errno.EPIPE:
-                    os.unlink(pipeout)
-    
+        
+        if WHICH == 'UDP':
+            
+            clientsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            clientsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            clientsocket.connect((UDP_IP, UDP_PORT))
+            while True:
+                clientsocket.send('%.3d,%.3d\n' % (float(self.pupil_position_x), float(self.pupil_position_y)))
+        
+        else:
+            while True:          
+                try:
+                    os.write(pipeout, '%d,%d\n' % (float(self.pupil_position_x), float(self.pupil_position_y)))   
+                except:
+                    time.sleep(.01)
+                    try:
+                        pipeout = os.open(pipe_name, os.O_WRONLY)
+                    except:
+                        break
+        
+            
+                
+            
     def get_camera_attribute(self, a):
         if self.camera_device != None and getattr(self.camera_device, 'camera',
                 None) is not None and self.camera_device.camera != None:
@@ -1096,4 +1113,4 @@ if not os.path.exists(pipe_name):
         os.mkfifo(pipe_name) 
            
 t = Thread(target=forPipe.child)
-t.start()
+t.start()   
