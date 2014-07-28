@@ -47,7 +47,9 @@ class VanillaBackend(ImageProcessingBackend):
         gaussian_kernel_cheat = 1.
 
         (rows, cols) = image.shape
-
+        # override rows - make more similar to slit
+        rows = 6
+    
         use_cached_sobel = False
         cached_mag = None
         cached_x = None
