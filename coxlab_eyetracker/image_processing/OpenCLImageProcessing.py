@@ -943,5 +943,3 @@ class FastRadialTransformKernel(MetaKernel):
         S = S / len(radii)  # Average
 
         return S
-
-
