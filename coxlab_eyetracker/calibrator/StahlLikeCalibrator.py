@@ -16,11 +16,14 @@ from scipy import stats
 import time
 from Queue import Queue, Full
 import cPickle as pkl
-
+from subprocess import *
+import os
 import logging
 
 
 class StahlLikeCalibrator:
+    
+
 
     uncalibrated = 0
     pupil_only_uncalibrated = 1
@@ -82,6 +85,7 @@ class StahlLikeCalibrator:
         self.quiet = 1
 
         self.CompLensDistor = CompensateLensDistorsion()
+        
 
     @property
     def info(self):
@@ -307,11 +311,34 @@ class StahlLikeCalibrator:
         print "y =\n", cr_array[:, 1]
 
         return mean(azimuth), mean(elevation), std(azimuth), std(elevation)
-
-
+        
+        
+#    def child():
+#
+#        pipeout = os.open(pipe_name, os.O_WRONLY)
+#
+#
+#        while True:
+#    
+#            time.sleep(1)
+#          
+#            (azimuth, elevation, azimuthDeviation, elevationDeviation) = self.report_set_gaze_values()
+#            os.write(pipeout, '1, 1 \n')# % (azimuth, elevation))
+#            #os.getpid() 
+#
+#    
+#    def initChild():
+#        
+#        if not os.path.exists(pipe_name):
+#            os.mkfifo(pipe_name)    
+# 
+#        t = Thread(target=self.child)
+#        t.start()
+#    
 
     def acquire_averaged_features(self, n, retry = 200):
-
+        
+        
         # ###### Start of Davide's implementation ######
 
         # Flush queue (somehow a buffer of images is stored during acquisition and must be flushed)
@@ -507,7 +534,7 @@ class StahlLikeCalibrator:
             calibration_status = self.uncalibrated
 
         if calibration_status is self.uncalibrated:
-            return pupil_coordinates[0], pupil_coordinates[1], calibration_status
+           return pupil_coordinates[0], pupil_coordinates[1], calibration_status
 
         # if we have no cr_coordinates, assume virtual ones
         if cr_coordinates is None:
@@ -848,8 +875,8 @@ class StahlLikeCalibrator:
         else:
             d -= delta
 
-        CR_diff = self._jogged_cr_difference(d, rs, self.x_image_axis)
-
+        CR_diff = self._jogged_cr_difference(d, rs, self.x_image_axis)      
+        
         i_max = 20  # at most, do 20 iterations
         for i in range(0, i_max):
             if abs(CR_diff) < self.cr_diff_threshold:
@@ -868,6 +895,9 @@ class StahlLikeCalibrator:
             CR_diff = self._jogged_cr_difference(d, rs, self.x_image_axis)
 
         return
+        
+    
+    
 
 
     def align_pupil_and_CR(self):
@@ -901,7 +931,8 @@ class StahlLikeCalibrator:
         print "Final Pupil position =", pupil_pos
         print("D = ", self.d)
         print("=====================================")
-
+        
+        
         return
 
 
@@ -1104,7 +1135,8 @@ class StahlLikeCalibrator:
         # Find the intersection of the lines
         x_cross = (p_side - p_top) / (m_top - m_side)
         y_cross = p_top + m_top * x_cross
-
+        
+        
         self.center_camera_frame = array( [y_cross, x_cross] )
         print "CENTER OF THE CAMERA FRAME =", self.center_camera_frame
 
@@ -1300,5 +1332,3 @@ class CompensateLensDistorsion:
         x_pix = self.map_cameraframe2pix( xn )
 
         return x_pix
-
-
