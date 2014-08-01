@@ -27,7 +27,7 @@ class VanillaBackend(ImageProcessingBackend):
 
     def sobel3x3_naive(self, image):
         sobel_x = array([[-1., 0., 1.], [-2., 0., 2.], [1., 0., -1]])
-        sobel_y = array([[1., 2., -1.], [0., 0., 0.], [-1., -2., 1]])
+        sobel_y = array([[0., 2., 0.], [0., 0., 0.], [0., -2., 0.]])
         imgx = convolve2d(image, sobel_x, mode='same', boundary='symm')
         imgy = convolve2d(image, sobel_y, mode='same', boundary='symm')
         mag = sqrt(imgx ** 2 + imgy ** 2) + 2e-16
@@ -48,7 +48,7 @@ class VanillaBackend(ImageProcessingBackend):
 
         (rows, cols) = image.shape
         # override rows - make more similar to slit
-        rows = 6
+        rows = 4
     
         use_cached_sobel = False
         cached_mag = None
