@@ -2,36 +2,41 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import PIL
 from numpy import *
 from EyeFeatureFinder import *
 from stopwatch import *
 from VanillaBackend import *
 from WovenBackend import *
-
+import os, time, sys
+from PIL import Image
+from threading import Thread
+pipe_name = '/Users/Intern/Documents/pipe_eye.txt'
+restore_sigpipe = True
 
 class FastRadialFeatureFinder(EyeFeatureFinder):
 
     def __init__(self):
 
-        # self.backend = VanillaBackend()
+        #self.backend = VanillaBackend()
         self.backend = WovenBackend()
         # self.backend = OpenCLBackend()
 
         self.target_kpixels = 80.0  # 8.0
-        self.max_target_kpixels = 50.0
+        self.max_target_kpixels = 20.0
         self.min_target_kpixels = 1.
         self.parameters_updated = 1
 
         self.alpha = 10.
         self.min_radius_fraction = 0.0126  # 1./2000.
-        self.max_radius_fraction = 0.12  # 1./8.
+        self.max_radius_fraction = 0.125  # 1./8.
         self.min_fraction = 1. / 1000.
         self.max_fraction = 0.35
         self.radius_steps = 6
         self.radiuses_to_try = [1]
         self.ds_factor = 1
 
-        self.correct_downsampling = False
+        self.correct_downsampling = True
 
         self.do_refinement_phase = 0
 
@@ -70,7 +75,6 @@ class FastRadialFeatureFinder(EyeFeatureFinder):
         im_array = image
         # im_array = image.astype(double)
         im_array = im_array[::self.ds_factor, ::self.ds_factor]
-
         if guess != None:
             features = guess
         else:
@@ -184,7 +188,6 @@ class FastRadialFeatureFinder(EyeFeatureFinder):
         else:
             return (c1_center, c2_center)
 
-
 def test_it():
 
     import matplotlib.pylab as plt
@@ -281,3 +284,4 @@ def test_it():
 
 if __name__ == '__main__':
     test_it()
+
