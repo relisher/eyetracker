@@ -31,6 +31,8 @@ def acquire_continuously(camera, ff):
         frame = camera.getAndLockCurrentFrame()
         im_array = (asarray(frame)).copy()
         camera.releaseCurrentFrame()
+        newWidth = int(im_array.size[0]/2)
+        im_array = im_array.resize((newWidth, im_array.size[1]), PIL.Image.ANTIALIAS)
 
         ff.analyzeImage(im_array)
 
@@ -114,6 +116,8 @@ class ProsilicaCameraDevice:
 
         frame = self.camera.getAndLockCurrentFrame()
         self.im_array = (asarray(frame)).copy()
+        newWidth = int(im_array.size[0]/2)
+        im_array = im_array.resize((newWidth, im_array.size[1]), PIL.Image.ANTIALIAS)
         # We could convert the timestamp from clock cycles to seconds by dividing by the available timestampFrequency
         # However, this could result in rounding errors. It might be easier to account for this in analysis scripts
         # or pass along timestampFrequency
@@ -149,5 +153,3 @@ class ProsilicaCameraDevice:
         self.nframes_done += 1
         #features["frame_number"] = self.frame_number
         return features
-
-
