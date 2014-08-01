@@ -187,6 +187,8 @@ class POVRaySimulatedCameraDevice:
         os.popen(command_string);
 
         im = PIL.Image.open("/Users/intern/projects/eyetracker/coxlab_eyetracker/image_processing/eyeball.png")
+        newWidth = int(im.size[0]/2)
+        im = im.resize((newWidth, im.size[1]), PIL.Image.ANTIALIAS)
         #print im
         a = asarray(im.convert("RGB"))
         #print a
