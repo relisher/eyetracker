@@ -179,14 +179,14 @@ class POVRaySimulatedCameraDevice:
 #            print "Command = " + command_string
 
         if(self.quiet):
-            command_string = "/usr/local/bin/povray -D +A +O/tmp/eyeball.png +W%d +H%d /tmp/eyeball.pov  >& /dev/null" % (self.w, self.h);
+            command_string = "/usr/local/bin/povray -D +A +O/Users/intern/projects/eyetracker/coxlab_eyetracker/image_processing/eyeball.png +W%d +H%d /tmp/eyeball.pov  >& /dev/null" % (self.w, self.h);
         else:
-            command_string = "/usr/local/bin/povray +O/tmp/eyeball.png +A +W%d +H%d /tmp/eyeball.pov" % (self.w, self.h);
+            command_string = "/usr/local/bin/povray +O/Users/intern/projects/eyetracker/coxlab_eyetracker/image_processing/eyeball.png +A +W%d +H%d /tmp/eyeball.pov" % (self.w, self.h);
             print "Command = " + command_string
 
         os.popen(command_string);
 
-        im = PIL.Image.open("/tmp/eyeball.png")
+        im = PIL.Image.open("/Users/intern/projects/eyetracker/coxlab_eyetracker/image_processing/eyeball.png")
         #print im
         a = asarray(im.convert("RGB"))
         #print a
